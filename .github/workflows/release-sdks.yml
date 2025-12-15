@@ -1,0 +1,77 @@
+name: Release SDKs
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 1. Setup
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # 2. Extract Version from Tag (e.g., "v1.0.1" -> "1.0.1")
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      # 3. Generate Python SDK
+      - name: Generate Python Client
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: python
+          openapi-file: openapi.json
+          command-args: >-
+            --output sdks/python 
+            --package-name sentience_sdk 
+            --package-version ${{ env.VERSION }}
+            --additional-properties=library=urllib3,projectName=sentienceapi-py
+
+      # 4. Build Python SDK
+      - name: Build Python SDK
+        run: |
+          cd sdks/python
+          pip install build
+          python -m build
+
+      # 5. Publish Python SDK to PyPI
+      - name: Publish Python SDK
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: sdks/python/dist/
+
+      # 6. Generate TypeScript SDK
+      - name: Generate TypeScript Client
+        uses: openapi-generators/openapitools-generator-action@v1
+        with:
+          generator: typescript-axios
+          openapi-file: openapi.json
+          command-args: >-
+            --output sdks/typescript 
+            --additional-properties=npmName=@rcholic/sentience-sdk,npmVersion=${{ env.VERSION }},supportsES6=true
+
+      # 7. Publish TypeScript SDK to NPM
+      - name: Publish TypeScript SDK
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd sdks/typescript
+          npm install
+          npm run build
+          npm publish --access public

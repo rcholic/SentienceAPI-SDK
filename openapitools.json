@@ -1,0 +1,28 @@
+{
+  "generator-cli": {
+    "version": "7.2.0",
+    "generators": {
+      "python": {
+        "generatorName": "python",
+        "output": "sdks/python",
+        "glob": "openapi.json",
+        "additionalProperties": {
+          "packageName": "sentience_sdk",
+          "projectName": "sentienceapi-py",
+          "library": "urllib3",
+          "generateSourceCodeOnly": false
+        }
+      },
+      "typescript": {
+        "generatorName": "typescript-axios",
+        "output": "sdks/typescript",
+        "glob": "openapi.json",
+        "additionalProperties": {
+          "supportsES6": true,
+          "npmName": "@rcholic/sentience-sdk",
+          "withSeparateModelsAndApi": true
+        }
+      }
+    }
+  }
+}
