@@ -56,15 +56,16 @@ pip install sentienceapi-py
 ```
 
 ```python
-from sentience_sdk import ApiClient, Configuration, ObservationApi
+from sentience_sdk import SentienceApiClient, SentienceConfiguration, SentienceObservationApi
 
 # Configure API client
-config = Configuration()
-config.access_token = "your-jwt-token"
+config = SentienceConfiguration()
+config.api_key['Authorization'] = "your-api-key"
+config.api_key_prefix['Authorization'] = "Bearer"
 
 # Create client
-with ApiClient(config) as api_client:
-    api = ObservationApi(api_client)
+with SentienceApiClient(config) as api_client:
+    api = SentienceObservationApi(api_client)
     
     # Call the observe endpoint
     response = api.observe(
@@ -83,16 +84,16 @@ npm install @rcholic/sentience-sdk
 ```
 
 ```typescript
-import { Configuration, ObservationApi } from '@rcholic/sentience-sdk';
+import { SentienceConfiguration, SentienceObservationApi } from '@rcholic/sentience-sdk';
 
 // Configure API client
-const config = new Configuration({
-  accessToken: 'your-jwt-token',
+const config = new SentienceConfiguration({
+  apiKey: 'Bearer your-api-key',
   basePath: 'https://api.sentienceapi.com'
 });
 
 // Create client
-const api = new ObservationApi(config);
+const api = new SentienceObservationApi(config);
 
 // Call the observe endpoint
 const response = await api.observe({

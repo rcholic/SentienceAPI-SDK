@@ -10,7 +10,9 @@
           "packageName": "sentience_sdk",
           "projectName": "sentienceapi-py",
           "library": "urllib3",
-          "generateSourceCodeOnly": false
+          "generateSourceCodeOnly": false,
+          "modelNamePrefix": "Sentience",
+          "apiNamePrefix": "Sentience"
         }
       },
       "typescript": {
@@ -20,7 +22,9 @@
         "additionalProperties": {
           "supportsES6": true,
           "npmName": "@rcholic/sentience-sdk",
-          "withSeparateModelsAndApi": true
+          "withSeparateModelsAndApi": true,
+          "modelNamePrefix": "Sentience",
+          "apiNamePrefix": "Sentience"
         }
       }
     }

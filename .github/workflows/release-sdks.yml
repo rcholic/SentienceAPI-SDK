@@ -1,37 +1,39 @@
-name: Release SDKs
-
+name: Release Sentience SDKs
 on:
   release:
     types: [published]
 
 jobs:
   generate-and-publish:
+    name: Build & Publish SDKs
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      # 1. Setup
       - uses: actions/checkout@v4
-      
+        with:
+          fetch-depth: 0
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-      
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # 2. Extract Version from Tag (e.g., "v1.0.1" -> "1.0.1")
       - name: Get version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      # 3. Generate Python SDK
+      # ----------------------------------------------------------------
+      # PYTHON SDK GENERATION
+      # ----------------------------------------------------------------
       - name: Generate Python Client
         uses: openapi-generators/openapitools-generator-action@v1
         with:
@@ -41,22 +43,34 @@ jobs:
             --output sdks/python 
             --package-name sentience_sdk 
             --package-version ${{ env.VERSION }}
-            --additional-properties=library=urllib3,projectName=sentienceapi-py
+            --additional-properties=library=urllib3,projectName=sentience_sdk,modelNamePrefix=Sentience,apiNamePrefix=Sentience
 
-      # 4. Build Python SDK
-      - name: Build Python SDK
+      - name: Apply Python Naming Fixes (Renaming Aliases)
+        run: |
+          cd sdks/python/sentience_sdk
+          
+          # 1. Open the main __init__.py
+          # 2. Append aliases so users can import 'SentienceApiClient' instead of 'ApiClient'
+          echo "" >> __init__.py
+          echo "# Sentience Custom Aliases" >> __init__.py
+          echo "from sentience_sdk.api_client import ApiClient as SentienceApiClient" >> __init__.py
+          echo "from sentience_sdk.configuration import Configuration as SentienceConfiguration" >> __init__.py
+          
+          # Now users can type: from sentience_sdk import SentienceApiClient
+
+      - name: Publish Python SDK
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           cd sdks/python
-          pip install build
-          python -m build
+          pip install setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/* --non-interactive
 
-      # 5. Publish Python SDK to PyPI
-      - name: Publish Python SDK
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: sdks/python/dist/
-
-      # 6. Generate TypeScript SDK
+      # ----------------------------------------------------------------
+      # TYPESCRIPT SDK GENERATION
+      # ----------------------------------------------------------------
       - name: Generate TypeScript Client
         uses: openapi-generators/openapitools-generator-action@v1
         with:
@@ -64,9 +78,26 @@ jobs:
           openapi-file: openapi.json
           command-args: >-
             --output sdks/typescript 
-            --additional-properties=npmName=@rcholic/sentience-sdk,npmVersion=${{ env.VERSION }},supportsES6=true
+            --package-name @sentience-api/client
+            --additional-properties=npmName=@sentience-api/client,npmVersion=${{ env.VERSION }},supportsES6=true,modelNamePrefix=Sentience,apiNamePrefix=Sentience
 
-      # 7. Publish TypeScript SDK to NPM
+      - name: Apply TypeScript Naming Fixes (Renaming Exports)
+        run: |
+          cd sdks/typescript
+          
+          # Create a new index.ts that re-exports with prefixes
+          # We rename the default Configuration and baseAPI to Sentience versions
+          
+          echo "export * from \"./api\";" > index.ts
+          echo "export * from \"./configuration\";" >> index.ts
+          
+          # Explicitly re-export Configuration as SentienceConfiguration
+          echo "import { Configuration } from \"./configuration\";" >> index.ts
+          echo "export { Configuration as SentienceConfiguration };" >> index.ts
+          
+          # Explicitly re-export BaseAPI/Factory as needed
+          # Note: typescript-axios generator structure varies, but this covers the config object
+
       - name: Publish TypeScript SDK
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
