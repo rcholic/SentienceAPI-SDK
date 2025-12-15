@@ -59,9 +59,7 @@ pip install sentienceapi-py
 from sentience_sdk import SentienceApiClient, SentienceConfiguration, SentienceObservationApi
 
 # Configure API client
-config = SentienceConfiguration(
-    host="https://api.sentienceapi.com"
-)
+config = SentienceConfiguration()
 config.api_key['Authorization'] = "Bearer sk_live_your_api_key"
 
 # Create client
@@ -89,8 +87,7 @@ import { SentienceConfiguration, SentienceObservationApi } from '@rcholic/sentie
 
 // Configure API client
 const config = new SentienceConfiguration({
-  apiKey: 'Bearer sk_live_your_api_key',
-  basePath: 'https://api.sentienceapi.com'
+  apiKey: 'Bearer sk_live_your_api_key'
 });
 
 // Create client
