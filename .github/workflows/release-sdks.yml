@@ -10,6 +10,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write  # Required for PyPI trusted publishing
 
     steps:
       - uses: actions/checkout@v4
