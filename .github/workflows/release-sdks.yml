@@ -42,8 +42,7 @@ jobs:
           command-args: >-
             --output sdks/python 
             --package-name sentience_sdk 
-            --package-version ${{ env.VERSION }}
-            --additional-properties=library=urllib3,projectName=sentience_sdk,modelNamePrefix=Sentience,apiNamePrefix=Sentience
+            --additional-properties=library=urllib3,projectName=sentience_sdk,packageVersion=${{ env.VERSION }},modelNamePrefix=Sentience,apiNamePrefix=Sentience
 
       - name: Apply Python Naming Fixes and Custom Wrapper
         run: |
