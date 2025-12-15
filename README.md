@@ -58,9 +58,8 @@ pip install sentienceapi-py
 ```python
 from sentience_sdk import SentienceApiClient, SentienceConfiguration, SentienceObservationApi
 
-# Configure API client
-config = SentienceConfiguration()
-config.api_key['Authorization'] = "Bearer sk_live_your_api_key"
+# Configure API client with your API key
+config = SentienceConfiguration(api_key="sk_live_your_api_key")
 
 # Create client
 with SentienceApiClient(config) as api_client:

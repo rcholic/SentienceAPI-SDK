@@ -45,18 +45,31 @@ jobs:
             --package-version ${{ env.VERSION }}
             --additional-properties=library=urllib3,projectName=sentience_sdk,modelNamePrefix=Sentience,apiNamePrefix=Sentience
 
-      - name: Apply Python Naming Fixes (Renaming Aliases)
+      - name: Apply Python Naming Fixes and Custom Wrapper
         run: |
           cd sdks/python/sentience_sdk
           
-          # 1. Open the main __init__.py
-          # 2. Append aliases so users can import 'SentienceApiClient' instead of 'ApiClient'
-          echo "" >> __init__.py
-          echo "# Sentience Custom Aliases" >> __init__.py
-          echo "from sentience_sdk.api_client import ApiClient as SentienceApiClient" >> __init__.py
-          echo "from sentience_sdk.configuration import Configuration as SentienceConfiguration" >> __init__.py
+          # Create custom SentienceConfiguration wrapper
+          cat > sentience_config.py << 'EOF'
+          from sentience_sdk.configuration import Configuration
           
-          # Now users can type: from sentience_sdk import SentienceApiClient
+          class SentienceConfiguration(Configuration):
+              """Custom Configuration wrapper for Sentience API with simplified authentication."""
+              
+              def __init__(self, api_key=None, **kwargs):
+                  super().__init__(**kwargs)
+                  if not api_key or not api_key.strip():
+                      raise ValueError("api_key is required and cannot be empty")
+                  # Automatically set the Authorization header with Bearer token
+                  self.api_key['Authorization'] = f"Bearer {api_key}" if not api_key.startswith('Bearer ') else api_key
+          EOF
+          
+          # Update __init__.py to export custom classes
+          echo "" >> __init__.py
+          echo "# Sentience Custom Aliases and Wrappers" >> __init__.py
+          echo "from sentience_sdk.api_client import ApiClient as SentienceApiClient" >> __init__.py
+          echo "from sentience_sdk.sentience_config import SentienceConfiguration" >> __init__.py
+          echo "from sentience_sdk.api.sentience_observation_api import SentienceObservationApi" >> __init__.py
 
       - name: Publish Python SDK
         env:
