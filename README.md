@@ -34,7 +34,7 @@ with SentienceApiClient(config) as api_client:
     response = api.observe(
         observe_request={
             "url": "https://example.com",
-            "mode": "reader"
+            "mode": "read"
         }
     )
     print(response)
@@ -45,7 +45,7 @@ with SentienceApiClient(config) as api_client:
             "url": "https://example.com",
             "mode": "map",
             "options": {
-                "render_quality": "high",
+                "render_quality": "precision",
                 "limit": 100
             }
         }
@@ -58,7 +58,7 @@ with SentienceApiClient(config) as api_client:
             "url": "https://example.com",
             "mode": "visual",
             "options": {
-                "render_quality": "high",
+                "render_quality": "performance",
                 "limit": 50
             }
         }
@@ -82,7 +82,7 @@ const api = new SentienceObservationApi(config);
 // Call the observe endpoint
 const response = await api.observe({
   url: 'https://example.com',
-  mode: 'reader'
+  mode: 'read'
 });
 console.log(response.data);
 
@@ -91,7 +91,7 @@ const responseWithOptions = await api.observe({
   url: 'https://example.com',
   mode: 'map',
   options: {
-    render_quality: 'high',
+    render_quality: 'precision',
     limit: 100
   }
 });
@@ -102,7 +102,7 @@ const visualResponse = await api.observe({
   url: 'https://example.com',
   mode: 'visual',
   options: {
-    render_quality: 'high',
+    render_quality: 'performance',
     limit: 50
   }
 });
