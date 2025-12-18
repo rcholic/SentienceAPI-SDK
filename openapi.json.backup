@@ -204,32 +204,6 @@
             "format": "uri",
             "description": "Optional residential proxy URL.",
             "example": "http://user:pass@proxy.example.com:8080"
-          },
-          "cookies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Cookie"
-            },
-            "description": "Cookies to inject for authenticated scraping. Requires HTTPS target URL."
-          },
-          "extraHeaders": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Extra HTTP headers to inject (e.g., Authorization: Bearer token). Requires HTTPS target URL."
-          },
-          "localStorage": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "LocalStorage data to inject (e.g., JWT tokens for SPAs). Requires HTTPS target URL."
-          },
-          "includeCursorFeedback": {
-            "type": "boolean",
-            "default": false,
-            "description": "Include cursor movement data in response (Read mode only, for debugging stealth behavior)."
           }
         }
       },
@@ -338,9 +312,7 @@
         "properties": {
           "mode": {
             "type": "string",
-            "enum": [
-              "read"
-            ],
+            "enum": ["read"],
             "default": "read"
           },
           "status": {
@@ -388,9 +360,6 @@
             "properties": {
               "metadata": {
                 "$ref": "#/components/schemas/ResponseMetadata"
-              },
-              "cursor_feedback": {
-                "$ref": "#/components/schemas/CursorFeedback"
               }
             }
           }
@@ -408,9 +377,7 @@
         "properties": {
           "mode": {
             "type": "string",
-            "enum": [
-              "map"
-            ],
+            "enum": ["map"],
             "default": "map"
           },
           "status": {
@@ -465,23 +432,17 @@
         "properties": {
           "mode": {
             "type": "string",
-            "enum": [
-              "visual"
-            ],
+            "enum": ["visual"],
             "default": "visual"
           },
           "engine": {
             "type": "string",
-            "enum": [
-              "precision"
-            ],
+            "enum": ["precision"],
             "default": "precision"
           },
           "source": {
             "type": "string",
-            "enum": [
-              "precision_visual"
-            ]
+            "enum": ["precision_visual"]
           },
           "status": {
             "type": "string",
@@ -826,141 +787,6 @@
           "pro",
           "enterprise"
         ]
-      },
-      "Cookie": {
-        "type": "object",
-        "required": [
-          "name",
-          "value",
-          "domain"
-        ],
-        "description": "Cookie for authenticated scraping (Puppeteer-compatible schema)",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Cookie name",
-            "example": "session_id"
-          },
-          "value": {
-            "type": "string",
-            "description": "Cookie value",
-            "example": "abc123xyz789"
-          },
-          "domain": {
-            "type": "string",
-            "description": "Cookie domain (e.g., .example.com). Must match or be parent of target URL domain.",
-            "example": ".example.com"
-          },
-          "path": {
-            "type": "string",
-            "default": "/",
-            "description": "Cookie path",
-            "example": "/"
-          },
-          "expires": {
-            "type": "integer",
-            "description": "Expiration timestamp (Unix seconds since epoch)",
-            "example": 1735689600
-          },
-          "httpOnly": {
-            "type": "boolean",
-            "description": "HttpOnly flag",
-            "example": true
-          },
-          "secure": {
-            "type": "boolean",
-            "description": "Secure flag (HTTPS only)",
-            "example": true
-          },
-          "sameSite": {
-            "type": "string",
-            "enum": [
-              "Strict",
-              "Lax",
-              "None"
-            ],
-            "description": "SameSite policy",
-            "example": "Lax"
-          }
-        }
-      },
-      "CursorFeedback": {
-        "type": "object",
-        "description": "Cursor movement data proving human-like behavior (Read mode only, when includeCursorFeedback=true)",
-        "required": [
-          "total_movements",
-          "duration_ms",
-          "path",
-          "metadata"
-        ],
-        "properties": {
-          "total_movements": {
-            "type": "integer",
-            "description": "Total number of cursor movements recorded (~35 per request)",
-            "example": 35
-          },
-          "duration_ms": {
-            "type": "integer",
-            "description": "Total duration of cursor movements in milliseconds",
-            "example": 1250
-          },
-          "path": {
-            "type": "array",
-            "description": "Array of cursor movement points (Bezier curve)",
-            "items": {
-              "$ref": "#/components/schemas/CursorMovement"
-            }
-          },
-          "metadata": {
-            "type": "object",
-            "description": "Metadata about cursor tracking",
-            "properties": {
-              "curve_type": {
-                "type": "string",
-                "enum": [
-                  "bezier"
-                ],
-                "description": "Type of curve used for movement generation"
-              },
-              "sampling_rate_ms": {
-                "type": "integer",
-                "description": "Average time between cursor points in milliseconds",
-                "example": 10
-              },
-              "timestamp": {
-                "type": "string",
-                "format": "date-time",
-                "description": "ISO 8601 timestamp when tracking started"
-              }
-            }
-          }
-        }
-      },
-      "CursorMovement": {
-        "type": "object",
-        "description": "Single cursor movement point",
-        "required": [
-          "x",
-          "y",
-          "timestamp"
-        ],
-        "properties": {
-          "x": {
-            "type": "integer",
-            "description": "X coordinate in pixels",
-            "example": 960
-          },
-          "y": {
-            "type": "integer",
-            "description": "Y coordinate in pixels",
-            "example": 540
-          },
-          "timestamp": {
-            "type": "integer",
-            "description": "Timestamp relative to start in milliseconds",
-            "example": 12
-          }
-        }
       }
     }
   }
